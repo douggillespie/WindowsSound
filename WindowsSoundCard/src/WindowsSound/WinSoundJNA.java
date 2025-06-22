@@ -8,6 +8,8 @@ import com.sun.jna.Native;
 import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 
+import PamView.dialog.warn.WarnOnce;
+
 public class WinSoundJNA {
 
 	// see https://www.baeldung.com/java-jna-dynamic-libraries for basic JNA stuff
@@ -22,6 +24,12 @@ public class WinSoundJNA {
 	private MMA mmaLib;
 
 	public WinSoundJNA() {
+		if (loadLibrary()) {
+			mmaLib.enumerateDevices();
+		}
+	}
+	
+	private boolean loadLibrary() {
 		String jnaPath = System.getProperty("jna.library.path");
 		if (jnaPath == null) {
 			String javaPath = System.getProperty("java.library.path");
@@ -30,17 +38,23 @@ public class WinSoundJNA {
 				System.setProperty("jna.library.path", javaPath);
 				System.setProperty("java.library.path", javaPath);
 			}
+			jnaPath = System.getProperty("jna.library.path");
 		}
 //		System.out.println("JNA library path is " + System.getProperty("jna.library.path"));
 		//		String libPath = "C:\\Users\\dg50\\source\\repos\\WindowsSoundJNA\\Release\\WINDOWSSOUNDJNA.dll";
-		String libPath = "WINDOWSSOUNDJNA.dll";
+		String libPath = "winmmsound.dll";
 		try {
 			mmaLib = Native.load(libPath, MMA.class);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Error e) {
+			String msg = String.format("The %s sound acquisition plugin requires the Windows libary file %s "
+					+ "to be included in the library path: %s. "
+					+ "note that this daq plugin is not suitable for non Windows platforms.",
+					WinMMDaqSystem.SYSTEMTYPE, libPath, jnaPath);
+			WarnOnce.showWarning("Missing Windows Library", msg, WarnOnce.WARNING_MESSAGE);
+			return false;
 		}
-		mmaLib.enumerateDevices();
+		return true;
 	}
 
 //	private void test() {

@@ -1,0 +1,5 @@
+lib64/
+Releases/
+
+*.jar
+.Rhistory

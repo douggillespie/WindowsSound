@@ -15,6 +15,7 @@ import Acquisition.AudioDataQueue;
 import Acquisition.DaqSystem;
 import Acquisition.SoundCardParameters;
 import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import WindowsSound.WinSoundJNA.MMA;
@@ -30,7 +31,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 	
 	private WinSoundJNA winSoundJNA;
 	
-	protected SoundCardParameters soundCardParameters = new SoundCardParameters(SYSTEMTYPE);
+	protected WinSoundParameters soundCardParameters = new WinSoundParameters(SYSTEMTYPE);
 
 	private MMA mmaLib;
 	
@@ -49,6 +50,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 		this.acquisitionControl = acquisitionControl;
 		winSoundJNA = new WinSoundJNA();
 		mmaLib = winSoundJNA.getMmaLib();
+		PamSettingManager.getInstance().registerSettings(this);
 	}
 
 	@Override
@@ -58,7 +60,9 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 
 	@Override
 	public String getSystemName() {
-		return acquisitionControl.getUnitName();
+		// should be the name of the selected card. 
+		return getDeviceName();
+//		return acquisitionControl.getUnitName();
 	}
 
 	public WinSoundDialogPanel getDialogPanel() {
@@ -119,8 +123,8 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 		if (dataCallback == null) {
 			dataCallback = new DataCallback();
 		}
-		byteConverter = ByteConverter.createByteConverter(2, false, Encoding.PCM_SIGNED);
-		int res = mmaLib.wavePrepare(soundCardParameters.deviceNumber, daqParams.nChannels, (int) daqParams.sampleRate, 16, dataCallback);
+		byteConverter = ByteConverter.createByteConverter(soundCardParameters.getBitDepth()/8, false, Encoding.PCM_SIGNED);
+		int res = mmaLib.wavePrepare(soundCardParameters.deviceNumber, daqParams.nChannels, (int) daqParams.sampleRate, soundCardParameters.getBitDepth(), dataCallback);
 		return res == WinSoundJNA.MMSYSERR_NOERROR;
 	}
 	
@@ -137,7 +141,8 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 			byte[] byteData = data.getByteArray(0, dataLength);
 			// now convert
 			int nChan = acquisitionControl.acquisitionParameters.nChannels;
-			int nSamples = dataLength / nChan / 2;
+			int bytes = soundCardParameters.getBitDepth() / 8;
+			int nSamples = dataLength / nChan / bytes;
 			double[][] raw = new double[nChan][nSamples];
 			byteConverter.bytesToDouble(byteData, raw, dataLength);
 			long ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
@@ -190,7 +195,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 
 	@Override
 	public String getUnitName() {
-		return getSystemName();
+		return acquisitionControl.getUnitName();
 	}
 
 	@Override
@@ -205,14 +210,24 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 
 	@Override
 	public long getSettingsVersion() {
-		return SoundCardParameters.serialVersionUID;
+		return WinSoundParameters.serialVersionUID;
 	}
 
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
-		soundCardParameters = (SoundCardParameters) pamControlledUnitSettings.getSettings();
-		soundCardParameters = soundCardParameters.clone();
-		return true;
+		if (pamControlledUnitSettings.getSettings() instanceof WinSoundParameters) {
+			soundCardParameters = (WinSoundParameters) pamControlledUnitSettings.getSettings();
+			soundCardParameters = soundCardParameters.clone();
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	@Override
+	public int getSampleBits() {
+		return soundCardParameters.getBitDepth();
 	}
 
 
