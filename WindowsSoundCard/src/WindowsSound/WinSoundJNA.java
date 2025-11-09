@@ -2,12 +2,15 @@ package WindowsSound;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Callback;
 import com.sun.jna.Pointer;
 
+import PamUtils.PlatformInfo;
+import PamUtils.PlatformInfo.OSType;
 import PamView.dialog.warn.WarnOnce;
 
 public class WinSoundJNA {
@@ -42,12 +45,18 @@ public class WinSoundJNA {
 		}
 //		System.out.println("JNA library path is " + System.getProperty("jna.library.path"));
 		//		String libPath = "C:\\Users\\dg50\\source\\repos\\WindowsSoundJNA\\Release\\WINDOWSSOUNDJNA.dll";
-		String libPath = "winmmsound.dll";
+		String libPath;
+		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+			libPath = "winmmsound.dll";
+		}
+		else {
+			libPath = "linuxsound.so";
+		}
 		try {
 			mmaLib = Native.load(libPath, MMA.class);
 		}
 		catch (Error e) {
-			String msg = String.format("The %s sound acquisition plugin requires the Windows libary file %s "
+			String msg = String.format("The %s sound acquisition plugin requires the libary file %s "
 					+ "to be included in the library path: %s. "
 					+ "note that this daq plugin is not suitable for non Windows platforms.",
 					WinMMDaqSystem.SYSTEMTYPE, libPath, jnaPath);
@@ -93,7 +102,20 @@ public class WinSoundJNA {
 	public String getDeviceName2(int iDevice) {
 		Pointer name2 = mmaLib.getDeviceName2(iDevice);
 		byte[] rawName = name2.getByteArray(0,64);
-		String devName2 = new String(rawName, StandardCharsets.UTF_16LE);
+		String devName2;
+		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+			devName2 = new String(rawName, StandardCharsets.UTF_16LE);
+		}
+		else {
+			// on Linux, this is still UTF8. 
+			for (int i = 0; i < rawName.length; i++) {
+				if (rawName[i] == 0) {
+					rawName = Arrays.copyOf(rawName, i);
+					break;
+				}
+			}
+			devName2 = new String(rawName, StandardCharsets.UTF_8);
+		}
 		return devName2;
 	}
 	
