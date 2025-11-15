@@ -69,6 +69,8 @@ public class WinSoundDialogPanel implements DialogComponent {
 	@Override
 	public boolean getParams() {
 		winMMDaqSystem.soundCardParameters.deviceNumber = deviceNames.getSelectedIndex();
+		String devName = (String) deviceNames.getSelectedItem();
+		winMMDaqSystem.soundCardParameters.setCardName(devName);
 		for (int i = 0; i < WinSoundParameters.BITDEPTHS.length; i++) {
 			if (bitButtons[i].isSelected()) {
 				winMMDaqSystem.soundCardParameters.setBitDepth(WinSoundParameters.BITDEPTHS[i]);

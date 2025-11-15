@@ -10,7 +10,8 @@ public class WinSoundPlugin implements DaqSystemInterface {
 
 	@Override
 	public String getDefaultName() {
-		return WinMMDaqSystem.SYSTEMTYPE;
+//		return WinMMDaqSystem.SYSTEMTYPE;
+		return "Low level (Native) Sound card access";
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class WinSoundPlugin implements DaqSystemInterface {
 
 	@Override
 	public String getAboutText() {
-		return "Acquisition using low level Windows sound drivers";
+		return "Acquisition using low level native sound card drivers";
 	}
 
 	@Override

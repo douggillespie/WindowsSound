@@ -8,7 +8,9 @@ public class WinSoundParameters extends SoundCardParameters implements Cloneable
 	
 	public static final int[] BITDEPTHS = {16, 24};
 	
-	private int bitDepth = 16;
+//	private int bitDepth = 16;
+	
+	private String cardName;
 
 	public WinSoundParameters(String systemType) {
 		super(systemType);
@@ -19,21 +21,29 @@ public class WinSoundParameters extends SoundCardParameters implements Cloneable
 		return (WinSoundParameters) super.clone();
 	}
 
-	/**
-	 * @return the bitDepth
-	 */
-	public int getBitDepth() {
-		if (bitDepth == 0) {
-			bitDepth = 16;
-		}
-		return bitDepth;
+//	/**
+//	 * @return the bitDepth
+//	 */
+//	public int getBitDepth() {
+//		if (bitDepth == 0) {
+//			bitDepth = 16;
+//		}
+//		return bitDepth;
+//	}
+//
+//	/**
+//	 * @param bitDepth the bitDepth to set
+//	 */
+//	public void setBitDepth(int bitDepth) {
+//		this.bitDepth = bitDepth;
+//	}
+
+	public String getCardName() {
+		return cardName;
 	}
 
-	/**
-	 * @param bitDepth the bitDepth to set
-	 */
-	public void setBitDepth(int bitDepth) {
-		this.bitDepth = bitDepth;
+	public void setCardName(String cardName) {
+		this.cardName = cardName;
 	}
 
 }

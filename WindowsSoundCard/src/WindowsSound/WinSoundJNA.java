@@ -1,6 +1,5 @@
 package WindowsSound;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -13,6 +12,13 @@ import PamUtils.PlatformInfo;
 import PamUtils.PlatformInfo.OSType;
 import PamView.dialog.warn.WarnOnce;
 
+/**
+ * the class name for this is a bit of a Misnomer since we now also support Linux. 
+ * windows systems need to link to the dll winmmsound.dll, linux to linuxsound.so.
+ * Windows uses the windows Multimedia library to access the sound card, Linux uses
+ * ALSA. both libraries have the same function calls, so this Java class will work with 
+ * either. 
+ */
 public class WinSoundJNA {
 
 	// see https://www.baeldung.com/java-jna-dynamic-libraries for basic JNA stuff
@@ -20,9 +26,9 @@ public class WinSoundJNA {
 	
 	public static final int MMSYSERR_NOERROR = 0;
 	
-//	public static void main(String[] args) {
-//		new WinSoundJNA().test();
-//	}
+	private static final String WINDLL = "winmmsound.dll";
+	
+	private static final String LINUXSO = "linuxsound.so";
 	
 	private MMA mmaLib;
 
@@ -47,10 +53,10 @@ public class WinSoundJNA {
 		//		String libPath = "C:\\Users\\dg50\\source\\repos\\WindowsSoundJNA\\Release\\WINDOWSSOUNDJNA.dll";
 		String libPath;
 		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
-			libPath = "winmmsound.dll";
+			libPath = WINDLL;
 		}
 		else {
-			libPath = "linuxsound.so";
+			libPath = LINUXSO;
 		}
 		try {
 			mmaLib = Native.load(libPath, MMA.class);
@@ -115,6 +121,7 @@ public class WinSoundJNA {
 				}
 			}
 			devName2 = new String(rawName, StandardCharsets.UTF_8);
+//			System.out.println(devName2);
 		}
 		return devName2;
 	}

@@ -25,7 +25,8 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 	
 	private AcquisitionControl acquisitionControl;
 	
-	public static final String SYSTEMTYPE = "Windows MM Sound";
+//	public static final String SYSTEMTYPE = "Native Sound";
+	public static final String SYSTEMTYPE = "Native Sound Card access";
 	
 	private ArrayList<String> deviceNames;
 	
@@ -123,11 +124,35 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 		if (dataCallback == null) {
 			dataCallback = new DataCallback();
 		}
+		int deviceIndex = checkDiviceIndex();
 		byteConverter = ByteConverter.createByteConverter(soundCardParameters.getBitDepth()/8, false, Encoding.PCM_SIGNED);
-		int res = mmaLib.wavePrepare(soundCardParameters.deviceNumber, daqParams.nChannels, (int) daqParams.sampleRate, soundCardParameters.getBitDepth(), dataCallback);
+		int res = mmaLib.wavePrepare(deviceIndex, daqParams.nChannels, (int) daqParams.sampleRate, soundCardParameters.getBitDepth(), dataCallback);
 		return res == WinSoundJNA.MMSYSERR_NOERROR;
 	}
 	
+	/**
+	 * Try to find the device by name. It that doesn't work, then use whatever the 
+	 * device index was. 
+	 * @return
+	 */
+	private int checkDiviceIndex() {
+		deviceNames = getDeviceNames();
+		if (deviceNames == null) {
+			return 0;
+		}
+		String cardName = soundCardParameters.getCardName();
+		if (cardName == null) {
+			cardName = "";
+		}
+		for (int i = 0; i < deviceNames.size(); i++) {
+			if (deviceNames.get(i).equals(cardName)) {
+				return i;
+			}
+		}
+		// gets here if it didn't find a named device. 
+		return soundCardParameters.deviceNumber;
+	}
+
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
 		int res = mmaLib.waveStart();
