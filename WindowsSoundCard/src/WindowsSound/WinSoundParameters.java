@@ -6,14 +6,22 @@ public class WinSoundParameters extends SoundCardParameters implements Cloneable
 
 	public static final long serialVersionUID = 1L;
 	
-	public static final int[] BITDEPTHS = {16, 24};
+	public static final int[] BITDEPTHS = {16, 24, 32};
 	
-//	private int bitDepth = 16;
+	private int bitDepth = 16;
 	
 	private String cardName;
 
 	public WinSoundParameters(String systemType) {
 		super(systemType);
+	}
+
+	public int getBitDepth() {
+		return bitDepth;
+	}
+
+	public void setBitDepth(int bitDepth) {
+		this.bitDepth = bitDepth;
 	}
 
 	@Override
