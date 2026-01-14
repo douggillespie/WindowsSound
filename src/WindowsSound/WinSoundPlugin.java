@@ -10,14 +10,12 @@ public class WinSoundPlugin implements DaqSystemInterface {
 
 	@Override
 	public String getDefaultName() {
-//		return WinMMDaqSystem.SYSTEMTYPE;
 		return "Low level (Native) Sound card access";
 	}
 
 	@Override
 	public String getHelpSetName() {
-		return "src/help/WinSoundHelp.hs";
-//		return "src/help/WinSoundHelp.hs";
+		return "help/WinSoundHelp.hs";
 	}
 
 	@Override
@@ -47,12 +45,12 @@ public class WinSoundPlugin implements DaqSystemInterface {
 
 	@Override
 	public String getPamVerDevelopedOn() {
-		return "V2.02.17";
+		return "V2.02.18";
 	}
 
 	@Override
 	public String getPamVerTestedOn() {
-		return "V2.02.17";
+		return "V2.02.18";
 	}
 
 	@Override
