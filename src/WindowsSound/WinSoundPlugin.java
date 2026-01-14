@@ -16,7 +16,8 @@ public class WinSoundPlugin implements DaqSystemInterface {
 
 	@Override
 	public String getHelpSetName() {
-		return null;
+		return "src/help/WinSoundHelp.hs";
+//		return "src/help/WinSoundHelp.hs";
 	}
 
 	@Override

@@ -1,0 +1,23 @@
+<html>
+
+<head>
+<LINK href="../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Native Sound Card Access</title>
+</head>
+
+<body>
+	<h1>Native Sound Card Access</h1>
+	<h2>Overview</h2>
+	<p>This plugin module allows PAMGuard to use low level sound card functions, bypassing JavaSound. On some platforms, this
+	allows higher sample rates than are possible with the 'normal' <a href="_mainHelp_sound_processing/AcquisitionHelp/docs/AcquisitionSoundCard.html">Sound Cards</a>), 
+	which use the standard JavaSound libraries. </p>
+	<p>To use the plugin you will need a native library to access the sound card on the system you are using. On Windows, this
+	is winmmsound.dll, which should be in the lib64 folder of the PAMGuard  installation folder. </p>
+	<p>For other operating systems, you may need to build the library yourself using / modifying code
+	at <a href="https://github.com/douggillespie/WindowsSoundJNA">https://github.com/douggillespie/WindowsSoundJNA</a>.
+	<p>The plugin has been successfully tested with two channel Cosmos E1DA sound cards at sample rates of 384kHz.</p>
+
+
+</body>
+</html>

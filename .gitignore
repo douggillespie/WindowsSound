@@ -1,5 +1,2 @@
-lib64/
-Releases/
-
-*.jar
-.Rhistory
+/bin/
+/target/

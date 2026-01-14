@@ -1,4 +1,4 @@
-package WindowsSound;
+package WindowsSound.swing;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -15,6 +15,8 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.DialogComponent;
 import PamView.panel.WestAlignedPanel;
+import WindowsSound.WinMMDaqSystem;
+import WindowsSound.WinSoundParameters;
 
 public class WinSoundDialogPanel implements DialogComponent {
 
@@ -57,27 +59,27 @@ public class WinSoundDialogPanel implements DialogComponent {
 		for (int i = 0; i < currNames.size(); i++) {
 			deviceNames.addItem(currNames.get(i).toString());
 		}
-		if (winMMDaqSystem.soundCardParameters.deviceNumber < currNames.size()) {
-			deviceNames.setSelectedIndex(winMMDaqSystem.soundCardParameters.deviceNumber);
+		if (winMMDaqSystem.getSoundCardParameters().deviceNumber < currNames.size()) {
+			deviceNames.setSelectedIndex(winMMDaqSystem.getSoundCardParameters().deviceNumber);
 		}
 		for (int i = 0; i < WinSoundParameters.BITDEPTHS.length; i++) {
-			bitButtons[i].setSelected(winMMDaqSystem.soundCardParameters.getBitDepth() == WinSoundParameters.BITDEPTHS[i]);
+			bitButtons[i].setSelected(winMMDaqSystem.getSoundCardParameters().getBitDepth() == WinSoundParameters.BITDEPTHS[i]);
 		}
 		
 	}
 
 	@Override
 	public boolean getParams() {
-		winMMDaqSystem.soundCardParameters.deviceNumber = deviceNames.getSelectedIndex();
+		winMMDaqSystem.getSoundCardParameters().deviceNumber = deviceNames.getSelectedIndex();
 		String devName = (String) deviceNames.getSelectedItem();
-		winMMDaqSystem.soundCardParameters.setCardName(devName);
+		winMMDaqSystem.getSoundCardParameters().setCardName(devName);
 		for (int i = 0; i < WinSoundParameters.BITDEPTHS.length; i++) {
 			if (bitButtons[i].isSelected()) {
-				winMMDaqSystem.soundCardParameters.setBitDepth(WinSoundParameters.BITDEPTHS[i]);
+				winMMDaqSystem.getSoundCardParameters().setBitDepth(WinSoundParameters.BITDEPTHS[i]);
 				break;
 			}
 		}
-		return winMMDaqSystem.soundCardParameters.deviceNumber >= 0;
+		return winMMDaqSystem.getSoundCardParameters().deviceNumber >= 0;
 	}
 
 }

@@ -19,6 +19,7 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import WindowsSound.WinSoundJNA.MMA;
+import WindowsSound.swing.WinSoundDialogPanel;
 import wavFiles.ByteConverter;
 
 public class WinMMDaqSystem extends DaqSystem implements PamSettings {
@@ -88,7 +89,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 		return getDialogPanel().getParams();
 	}
 
-	protected ArrayList<String> getDeviceNames() {
+	public ArrayList<String> getDeviceNames() {
 		if (deviceNames == null) {
 			deviceNames = new ArrayList<>();
 			int nDev = mmaLib.enumerateDevices();
@@ -253,6 +254,13 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 	@Override
 	public int getSampleBits() {
 		return soundCardParameters.getBitDepth();
+	}
+
+	/**
+	 * @return the soundCardParameters
+	 */
+	public WinSoundParameters getSoundCardParameters() {
+		return soundCardParameters;
 	}
 
 
