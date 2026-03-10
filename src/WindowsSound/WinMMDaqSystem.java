@@ -150,11 +150,11 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 	 */
 	public int getDeviceNumber(int number, String name) {
 		ArrayList<String> devList = getDeviceNames();
-		if (devList == null) {
+		if (devList == null || devList.size() == 0) {
 			return 0;
 		}
 		if (name == null) {
-			return number;
+			return Math.min(number, devList.size()-1);
 		}
 		for (int i = 0; i < devList.size(); i++) {
 			String aDev = devList.get(i);
@@ -162,7 +162,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 				return i;
 			}
 		}
-		return 0;
+		return Math.min(number, devList.size()-1);
 	}
 	
 	/**
@@ -220,7 +220,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 		if (dataCallback == null) {
 			dataCallback = new DataCallback();
 		}
-		int deviceIndex = checkDiviceIndex();
+		int deviceIndex = getDeviceNumber();
 		byteConverter = ByteConverter.createByteConverter(soundCardParameters.getBitDepth()/8, false, Encoding.PCM_SIGNED);
 		int res = mmaLib.wavePrepare(deviceIndex, daqParams.nChannels, (int) daqParams.sampleRate, soundCardParameters.getBitDepth(), dataCallback);
 		return res == WinSoundJNA.MMSYSERR_NOERROR;
@@ -231,23 +231,23 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 	 * device index was. 
 	 * @return
 	 */
-	private int checkDiviceIndex() {
-		deviceNames = getDeviceNames();
-		if (deviceNames == null) {
-			return 0;
-		}
-		String cardName = soundCardParameters.getCardName();
-		if (cardName == null) {
-			cardName = "";
-		}
-		for (int i = 0; i < deviceNames.size(); i++) {
-			if (deviceNames.get(i).equals(cardName)) {
-				return i;
-			}
-		}
-		// gets here if it didn't find a named device. 
-		return soundCardParameters.deviceNumber;
-	}
+//	private int checkDiviceIndex() {
+//		deviceNames = getDeviceNames();
+//		if (deviceNames == null) {
+//			return 0;
+//		}
+//		String cardName = soundCardParameters.getCardName();
+//		if (cardName == null) {
+//			cardName = "";
+//		}
+//		for (int i = 0; i < deviceNames.size(); i++) {
+//			if (deviceNames.get(i).equals(cardName)) {
+//				return i;
+//			}
+//		}
+//		// gets here if it didn't find a named device. 
+//		return 0;
+//	}
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
