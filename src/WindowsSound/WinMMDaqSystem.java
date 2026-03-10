@@ -14,12 +14,14 @@ import Acquisition.AcquisitionParameters;
 import Acquisition.AudioDataQueue;
 import Acquisition.DaqSystem;
 import Acquisition.SoundCardParameters;
+import Acquisition.SoundCardSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import WindowsSound.WinSoundJNA.MMA;
 import WindowsSound.swing.WinSoundDialogPanel;
+import pamguard.GlobalArguments;
 import wavFiles.ByteConverter;
 
 public class WinMMDaqSystem extends DaqSystem implements PamSettings {
@@ -53,6 +55,33 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 		winSoundJNA = new WinSoundJNA();
 		mmaLib = winSoundJNA.getMmaLib();
 		PamSettingManager.getInstance().registerSettings(this);
+		checkGlobalArguments();
+	}
+
+	/**
+	 * Check to see if a device name or number has been fed in as a global argument
+	 */
+	private void checkGlobalArguments() {
+		String gName = GlobalArguments.getParam(SoundCardSystem.SETDEVNAME);
+		if (gName != null) {
+			if (checkDeviceName(gName)) {
+				soundCardParameters.deviceName = gName;
+				soundCardParameters.deviceNumber = getDeviceNumber(soundCardParameters.deviceNumber, gName);
+			}
+		}
+		
+		String gNumS = GlobalArguments.getParam(SoundCardSystem.SETDEVNUMBER);
+		if (gNumS != null) {
+			try {
+				int gNum = Integer.valueOf(gNumS);
+				soundCardParameters.deviceNumber = gNum;
+				soundCardParameters.deviceName = getDeviceName(gNum);
+			}
+			catch (NumberFormatException e) {
+				
+			}
+		}
+		
 	}
 
 	@Override
@@ -99,6 +128,72 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 			}
 		}
 		return deviceNames;
+	}
+	/**
+	 * Get the soundcard device number. Ideally this should be from the name, but can also
+	 * be from the number if the name doesnt' exist. 
+	 * @return
+	 */
+	public int getDeviceNumber() {
+		if (soundCardParameters == null) {
+			return 0;
+		}
+		return getDeviceNumber(soundCardParameters.deviceNumber, soundCardParameters.deviceName);
+	}
+	
+	/**
+	 * Get the device number to run. This should be based on name, but can default back 
+	 * to the number if the name cannot be found
+	 * @param number device number
+	 * @param name device name
+	 * @return usable device number
+	 */
+	public int getDeviceNumber(int number, String name) {
+		ArrayList<String> devList = getDeviceNames();
+		if (devList == null) {
+			return 0;
+		}
+		if (name == null) {
+			return number;
+		}
+		for (int i = 0; i < devList.size(); i++) {
+			String aDev = devList.get(i);
+			if (name.equals(aDev)) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
+	/**
+	 * Get a device name for a number
+	 * @param devNumber
+	 * @return
+	 */
+	public String getDeviceName(int devNumber) {
+		ArrayList<String> devList = getDeviceNames();
+		if (devList == null || devList.size() <= devNumber) {
+			return null;
+		}
+		return devList.get(devNumber);
+	}
+	
+	/**
+	 * Check a device name exists (Case sensitive);
+	 * @param devName
+	 * @return true if it exists. 
+	 */
+	public boolean checkDeviceName(String devName) {
+		ArrayList<String> devList = getDeviceNames();
+		if (devList == null || devName == null) {
+			return false;
+		}
+		for (String aName : devList) {
+			if (aName.equals(devName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -212,7 +307,7 @@ public class WinMMDaqSystem extends DaqSystem implements PamSettings {
 	@Override
 	public String getDeviceName() {
 		 ArrayList<String> names = getDeviceNames();
-		int iN = soundCardParameters.deviceNumber;
+		int iN = getDeviceNumber();
 		if (iN >=0 && iN < names.size()) {
 			return names.get(iN);
 		}

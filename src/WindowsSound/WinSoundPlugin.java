@@ -45,12 +45,12 @@ public class WinSoundPlugin implements DaqSystemInterface {
 
 	@Override
 	public String getPamVerDevelopedOn() {
-		return "V2.02.18";
+		return "V2.02.18a";
 	}
 
 	@Override
 	public String getPamVerTestedOn() {
-		return "V2.02.18";
+		return "V2.02.18a";
 	}
 
 	@Override

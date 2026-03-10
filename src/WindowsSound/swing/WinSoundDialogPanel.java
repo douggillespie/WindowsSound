@@ -59,8 +59,8 @@ public class WinSoundDialogPanel implements DialogComponent {
 		for (int i = 0; i < currNames.size(); i++) {
 			deviceNames.addItem(currNames.get(i).toString());
 		}
-		if (winMMDaqSystem.getSoundCardParameters().deviceNumber < currNames.size()) {
-			deviceNames.setSelectedIndex(winMMDaqSystem.getSoundCardParameters().deviceNumber);
+		if (winMMDaqSystem.getDeviceNumber() < currNames.size()) {
+			deviceNames.setSelectedIndex(winMMDaqSystem.getDeviceNumber());
 		}
 		for (int i = 0; i < WinSoundParameters.BITDEPTHS.length; i++) {
 			bitButtons[i].setSelected(winMMDaqSystem.getSoundCardParameters().getBitDepth() == WinSoundParameters.BITDEPTHS[i]);
